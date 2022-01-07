@@ -108,17 +108,17 @@ class PageController extends Controller
                 curl_setopt($cURLConnection, CURLOPT_RETURNTRANSFER, true);
                 $output = curl_exec($cURLConnection);
                 $output = json_decode($output, true); // convert to array
-                $last =end($output['selector']['trips']['0']);
+                $last = end($output['selector']['trips']['0']);
                 if ($last == null) {
                     $last['format'] = null;
                 }
                 $last_trip[] = $last['format']; // store final output in array
 
             }
-            // return $last_trip;
-
-            return  view('trips', compact('items', 'sensors_values','sid','last_trip'));
-
+            if ($request->ajax()) {
+                return  view('includes.table', compact('items', 'sensors_values', 'sid', 'last_trip'));
+            }
+            return  view('trips', compact('items', 'sensors_values', 'sid', 'last_trip','data'));
         } else {
             $request->session()->forget('token');
             return redirect()->route('login');

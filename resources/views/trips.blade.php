@@ -45,14 +45,30 @@
                 <ul class="navbar-nav ml-auto">
                     <!-- Authentication Links -->
 
+                    <li class="nav-item dropdown">
+                        <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                            {{$data['user']['nm'].' | '.$data['user']['id']}}
+                        </a>
 
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
+                                                     document.getElementById('logout-form').submit();">
+                                {{ __('Logout') }}
+                            </a>
+
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST"
+                                class="d-none">
+                                @csrf
+                            </form>
+                        </div>
+                    </li>
 
                 </ul>
             </div>
         </div>
     </nav>
     <div id="container" class="container">
-
 
         <table class="table">
             <thead>
@@ -68,21 +84,24 @@
                 </tr>
             </thead>
             <tbody id="tbody">
-                @foreach ($items as $index =>$item)
+                @foreach ($items as $index => $item)
                     <tr>
                         <td>{{ $item['id'] }}</td>
                         <td>{{ $item['nm'] }}</td>
-                        <td><img src="http://gps.tawasolmap.com{{$item['uri']}}?side={{$sid}}" alt="" srcset=""></td>
+                        <td><img src="http://gps.tawasolmap.com{{ $item['uri'] }}?side={{ $sid }}" alt=""
+                                srcset=""></td>
                         <td>
                             @foreach ($item['sens'] as $key => $s)
-                                <span>{{ $s['n'] . '(' . $s['t'] . ') = ' .$sensors_values[$index][$key]. '(' . $s['m'] . ')'  }}</span><br>
+                                <span>{{ $s['n'] . '(' . $s['t'] . ') = ' . $sensors_values[$index][$key] . '(' . $s['m'] . ')' }}</span><br>
                             @endforeach
                         </td>
                         <td>{{ $item['pos']['s'] }}</td>
-                        <td class="col-md-2">Y: {{$item['pos']['y'].", X:". $item['pos']['x']}}</td>
-                        <th>{{file_get_contents('http://gps.tawasolmap.com/gis_geocode?coords=[{"lon":'.$item["pos"]["x"].',"lat":'.$item["pos"]["y"].'}]&flags=1&uid=62289')}}</th>
-                        <th> @if ($last_trip[$index] != null)
-                        {{$last_trip[$index]['distance']}}
+                        <td class="col-md-2">Y: {{ $item['pos']['y'] . ', X:' . $item['pos']['x'] }}</td>
+                        <th>{{ file_get_contents('http://gps.tawasolmap.com/gis_geocode?coords=[{"lon":' . $item['pos']['x'] . ',"lat":' . $item['pos']['y'] . '}]&flags=1&uid=62289') }}
+                        </th>
+                        <th>
+                            @if ($last_trip[$index] != null)
+                                {{ $last_trip[$index]['distance'] }}
                             @endif
                             {{-- {{$last_trip[$index]['format']}} --}}
                         </th>
@@ -94,47 +113,31 @@
 
     <script src="{{ asset('js/app.js') }}"></script>
     <script>
-        // execute when DOM ready
-        // $(document).ready(function() {
+        $(document).ready(function() {
+            setInterval(function() {
+                $.ajax({
+                    type: 'get',
+                    url: '{{ route('units') }}',
+                    success: function(data) {
+                        // $('body').html(data);
+                        console.log('data')
+                        $('#container').html(data)
+                        // console.log(data);
+                    },
+                    error: function(request, status, error) {
+                        console.log(request.responseText);
+                    }
+                });
+            }, 10000);
 
-        $.get('http://gps.tawasolmap.com/gis_geocode?coords=[{"lon":24.7828783,"lat":46.6375516}]&flags=1&uid=62289',
-            function(data) {
-                // $( ".result" ).html( data );
-                console.log(data);
-                // alert( "Load was performed." );
-            });
-
-        var container = $('#container');
-
-        // $.ajax({
-        //     type : 'get',
-        //     url : '{{ route('api') }}',
-        //     // data:{  'type':type,
-        //     // 'range':range},
-        //     // dataType:'json',
-        //     success:function(data){
-        //         console.log('run');
-        //         console.log('{{ route('api') }}');
-        //         console.log(data);
-        //         container.html(data);
-        //     },
-        //     error: function(data){
-        //         var errors = data.responseJSON;
-        //         console.log(errors);
-        //     }
-        //     });
-
-        // });
+        });
     </script>
-
-
-
     <script type="text/javascript">
-        // $.ajaxSetup({
-        //     headers: {
-        //         'csrftoken': '{{ csrf_token() }}'
-        //     }
-        // });
+        $.ajaxSetup({
+            headers: {
+                'csrftoken': '{{ csrf_token() }}'
+            }
+        });
     </script>
 
 </body>
