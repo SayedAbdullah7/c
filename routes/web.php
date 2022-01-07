@@ -19,7 +19,7 @@ Route::group([
     'middleware' => ['token'],
 ], function ($router) {
         Route::get('units',[PageController::class,'show'])->name('units');
-        Route::get('trips',[PageController::class,'api'])->name('trips');
+        // Route::get('trips',[PageController::class,'api'])->name('trips');
         Route::get('api',[PageController::class,'api'])->name('api');
 
 });

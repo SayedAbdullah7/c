@@ -53,35 +53,9 @@ class PageController extends Controller
         $token = $request->session()->get('token');
         $wialon_api = new Wialon();
         $result = $wialon_api->login($token);
-
         $data = json_decode($result, true);
 
         if (!isset($data['error'])) {
-            $data = json_decode($result, true);
-            // return $data['user']['nm'].'|'.$data['user']['id'];
-            return view('home', compact('data', 'token'));
-        } else {
-            $request->session()->forget('token');
-            return redirect()->route('login');
-        }
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function api(Request $request)
-    {
-        $token = $request->session()->get('token');
-        $wialon_api = new Wialon();
-        $result = $wialon_api->login($token);
-        $data = json_decode($result, true);
-
-
-        if (!isset($data['error'])) {
-
             $sid = $data['eid']; // session id
             $params = array(
                 "spec" => array(
@@ -140,17 +114,26 @@ class PageController extends Controller
                 }
                 $last_trip[] = $last['format']; // store final output in array
 
-
             }
             // return $last_trip;
 
             return  view('trips', compact('items', 'sensors_values','sid','last_trip'));
 
-
         } else {
             $request->session()->forget('token');
             return redirect()->route('login');
         }
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        //
     }
 
     /**
